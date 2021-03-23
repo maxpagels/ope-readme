@@ -88,3 +88,5 @@ Finally, note what happens if we try to run `--eval` with an estimator we know i
     vw (cb_algs.cc:161): direct method can not be used for evaluation --- it is biased.
     
  ## Policy evaluation with `cb_adf`-format data, using a premade policy
+
+The `cb_adf` format is especially useful is you have rich features associated with an arm, or a variable number of arms per round. In cases where you have the former, you can convert your `cb_adf` data into the equivalent `cb`-format data and follow the section above. Unfortunately, using `--eval` with `cb_adf` directly is not currently supported.
