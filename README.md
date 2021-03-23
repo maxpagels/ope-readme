@@ -6,9 +6,10 @@ In supervised learning settings, the standard approach to offline evaluation is 
 
 It doesn't, then, seem possible to reliably evaluate contextual bandit policies offline. But it is! The key is to use estimators that fill in fake rewards for actions that weren't taken, thereby creating a "fake" supervised learning dataset, against which you can estimate performance, either using progressive validation or a holdout set.
 
-VW implements several estimators to reduce policy evaluation to supervised learning-type evaluation. The simplest method, the direct method (DM) simply trains a regression model that estimates the cost (negative reward) of an (action, context) pair. As you might suspect, this method is generally biased, because the partial information problem means you typically see many more rewards for good actions than bad ones (assuming your production policy is working normally). Biased estimators should not be used for offline policy evaluation, but VW implements provably unbiased estimators like IPS that can be used for this purpose.
+VW implements several estimators to reduce policy evaluation to supervised learning-type evaluation. The simplest method, the direct method (DM) simply trains a regression model that estimates the cost (negative reward) of an (action, context) pair. As you might suspect, this method is generally biased, because the partial information problem means you typically see many more rewards for good actions than bad ones (assuming your production policy is working normally). Biased estimators should not be used for offline policy evaluation, but VW implements provably unbiased estimators like inverse propensity weighting (IPS) and doubly robust (DR) that can be used for this purpose.
 
 Finally, before we get into how to run offline policy evaluation in VW, note that in this tutorial, by policies we mean contextual bandit models, not the exploration layer (e.g. epsilon-greedy) that is usually part of a contextual bandit system to tackle the explore-exploit tradeoff where we must try different actions to learn what works and what doesn't. 
+
 For now, If you wish to evaluate the performance of the entire loop (model + exploration), please refer to the documentation for `--explore_eval`. It is useful if you want to understand how different types of exploration might lead to better future rewards in an online learning bandit system.
 
 ## Policy evaluation with `cb`-format data, using a premade policy
@@ -46,3 +47,42 @@ You are now ready to run policy evaluation using the command `vw --cb <number_of
     weighted label sum = 0.000000
     average loss = 6.501957
     total feature number = 9
+
+The key metric is `average loss`. How it is calculated depends on the estimator; for example, if you wish to use an estimator other than the default `DR` (TODO confirm that this is the default), you may do so using the `--cb_type` option. For IPS, run `vw --cb 2 --eval -d eval.dat --cb_type ips`:
+
+    Num weight bits = 18
+    learning rate = 0.5
+    initial_t = 0
+    power_t = 0.5
+    using no cache
+    Reading datafile = eval.dat
+    num sources = 1
+    Enabled reductions: gd, scorer, csoaa, cb
+    average  since         example        example  current  current  current
+    loss     last          counter         weight    label  predict features
+    0.000000 0.000000            1            1.0    known        2        3
+    2.500000 5.000000            2            2.0    known        2        3
+
+    finished run
+    number of examples = 3
+    weighted example sum = 3.000000
+    weighted label sum = 0.000000
+    average loss = 8.333333
+    total feature number = 9
+    
+This toy example has far to few examples to form a reliable estimate of the candidate policy's performance, but generally, the `average loss` estimate if the OPE estimate.
+
+The interpretation of OPE is important to get right: if your candidate policy produces an OPE estimate of `3.0` and your production policy has an average loss of `6.0` (easily calculated by summing the costs in the bandit data, divided by the number of instances), it means that had you deployed the candidate policy, with no exploration, instead of the production policy _at the time the production policy was deployed_, you could have expected to se average costs reduce by 50%.
+
+Finally, note what happens if we try to run `--eval` with an estimator we know is biased, `vw --cb 2 --eval -d eval.dat --cb_type dm`. You will end up with an error, to prevent you from making a mistake:
+
+    Error: direct method can not be used for evaluation --- it is biased.
+
+    finished run
+    number of examples = 0
+    weighted example sum = 0.000000
+    weighted label sum = 0.000000
+    average loss = n.a.
+    total feature number = 0
+    direct method can not be used for evaluation --- it is biased.
+    vw (cb_algs.cc:161): direct method can not be used for evaluation --- it is biased.
