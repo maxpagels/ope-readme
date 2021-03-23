@@ -48,7 +48,7 @@ You are now ready to run policy evaluation using the command `vw --cb <number_of
     average loss = 6.501957
     total feature number = 9
 
-The key metric is `average loss`. How it is calculated depends on the estimator; for example, if you wish to use an estimator other than the default `DR` (TODO confirm that this is the default), you may do so using the `--cb_type` option. For IPS, run `vw --cb 2 --eval -d eval.dat --cb_type ips`:
+The key metric is `average loss`, which corresponds to the OPE estimate (TODO confirm). How it is calculated depends on the estimator; for example, if you wish to use an estimator other than the default `DR` (TODO confirm that this is the default), you may do so using the `--cb_type` option. For IPS, run `vw --cb 2 --eval -d eval.dat --cb_type ips`:
 
     Num weight bits = 18
     learning rate = 0.5
