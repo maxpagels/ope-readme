@@ -86,3 +86,5 @@ Finally, note what happens if we try to run `--eval` with an estimator we know i
     total feature number = 0
     direct method can not be used for evaluation --- it is biased.
     vw (cb_algs.cc:161): direct method can not be used for evaluation --- it is biased.
+    
+ ## Policy evaluation with `cb_adf`-format data, using a premade policy
