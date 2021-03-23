@@ -70,7 +70,7 @@ The key metric is `average loss`. How it is calculated depends on the estimator;
     average loss = 8.333333
     total feature number = 9
     
-This toy example has far to few examples to form a reliable estimate of the candidate policy's performance, but generally, the `average loss` estimate if the OPE estimate.
+This toy example has far to few examples to form a reliable estimate of the candidate policy's performance, but generally, the `average loss` estimate if the OPE estimate. We recommend sticking to the default estimator unless you have a good reason not to.
 
 The interpretation of OPE is important to get right: if your candidate policy produces an OPE estimate of `3.0` and your production policy has an average loss of `6.0` (easily calculated by summing the costs in the bandit data, divided by the number of instances), it means that had you deployed the candidate policy, with no exploration, instead of the production policy _at the time the production policy was deployed_, you could have expected to se average costs reduce by 50%.
 
