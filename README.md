@@ -137,3 +137,4 @@ Following our example, `vw --cb 2 -d train.txt --cb_type ips` will train a polic
     total feature number = 18
     
  
+Again, the `average cost` is the key metric. Because VW is an incremental learner by default, learning on one example at a time over a single epoch, it uses _progressive validation_. Without going into specifics, progressive validation (PV) is a validation technique that converges like a holdout set in one-pass learning. It is thus a good metric of the generalisation performance. The loss used here depends on the `cb_type`; in this case, the average loss is the PV IPS loss, and roughly corresponds to performance on a theoretical holdout set. It is comparable against the average cost calculated from the production policy's bandit data. So, in this case, our candidate policy is worse than out production policy. Again, this toy example has far too few samples to form a good loss estimate, but the principal applies.
