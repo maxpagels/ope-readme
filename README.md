@@ -89,11 +89,11 @@ Finally, note what happens if we try to run `--eval` with an estimator we know i
     direct method can not be used for evaluation --- it is biased.
     vw (cb_algs.cc:161): direct method can not be used for evaluation --- it is biased.
     
- ## Policy evaluation with `cb_adf`-format data, using a premade policy
+## Policy evaluation with `cb_adf`-format data, using a premade policy
 
 The `cb_adf` format is especially useful is you have rich features associated with an arm, or a variable number of arms per round. In cases where you have the former, you can convert your `cb_adf` data into the equivalent `cb`-format data and follow the section above. Unfortunately, using `--eval` with `cb_adf` directly is not currently supported.
 
- ## Policy evaluation with `cb`-format data, training a candidate policy simultaneously
+## Policy evaluation with `cb`-format data, training a candidate policy simultaneously
  
 Before continuing, it is worth understanding that policy value estimators such as IPS, DM and DR aren't only useful for policy value estimation. Since they provide us a way to fill in fake rewards for untaken actions, they allow use to reduce bandit learning to supervised learning, and used to _train_ policies. For example, say you have a (biased) DM estimator. For each untaken action per round, you can predict a reward, thus forming a supervised learning example where the loss of each action is known (estimated). You can then train an importance-weighted classification model, or even a regression model that estimates costs of arms given contexts, and use these models as policies. This is, in fact, what VW does: estimators serve a dual purpose, and are used not only for evaluation but also optimisation/training.
 
@@ -144,3 +144,7 @@ There are several cases in which incremental learning is desirable. You may want
 If you want to learn over many epochs, you can use the `--passes` option, in which case the average loss reported is the holdout loss (every nth example, configurable via `--holdout_period`. You may also use `--holdout_off`, save the model with e.g. `-f model.ve` and test againt a separate dataset by loading the model using `vw -i model.vw -d <test_dataset>`.
 
 *NOTE*: when you train policies using VW, the loss reported depends on the `cb_type` provided. If e.g `cb_type` is `dm`, DM will be used for training, and reporting the average loss. If this estimator is unbiased, the loss should *not* be interpreted as an OPE estimate and thus not used for evaluating candidate policies. Currently it is not possible to tell `VW` to use a particular `cb_type` for training but another estimator for reporting the loss (TODO confirm).
+
+## Policy evaluation with `cb_adf`-format data, training a candidate policy simultaneously
+
+If your data is in `cb_adf` format, the same basic setup as above applies. Train with `vw --cb_adf -d <dataset> --cb_type <cb_type>`. The loss intepretation is the same as with `cb`, and the same caveats for unbiased estimators apply.
